@@ -30,5 +30,6 @@ class TripleBatch(BaseModel):
 
 class HybridResult(BaseModel):
     answer_context: str
+    answer: str
     chunks: list[DocumentChunk]
     triples: list[Triple]

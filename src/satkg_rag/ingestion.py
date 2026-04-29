@@ -41,7 +41,10 @@ def _load_with_langchain(path: Path) -> str:
 
 def load_document_text(path: Path, prefer_langchain: bool = True) -> str:
     if prefer_langchain:
-        return _load_with_langchain(path)
+        try:
+            return _load_with_langchain(path)
+        except ImportError:
+            pass
     if path.suffix.lower() == ".pdf":
         return _load_pdf_text(path)
     return _load_text(path)

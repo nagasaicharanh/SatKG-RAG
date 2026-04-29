@@ -7,7 +7,8 @@ class PipelineConfig:
     chunk_size_tokens: int = 350
     chunk_overlap_tokens: int = 60
     spacy_model: str = "en_core_web_sm"
-    ollama_model: str = "mistral"
+    ollama_model: str = "mistral:7b"
+    ollama_timeout_seconds: int = 45
     embedding_model: str = "all-MiniLM-L6-v2"
     chroma_collection: str = "satkg_chunks"
     chroma_dir: Path = Path(".chroma")
