@@ -1,273 +1,171 @@
-# SatKG-RAG
+<div align="center">
 
-SatKG-RAG is a local-first satellite knowledge graph and GraphRAG demo. It turns technical satellite documents into chunks, entities, RDF/OWL triples, an interactive knowledge graph, and grounded answers that combine vector retrieval with graph context.
+# 🛰️ SatKG-RAG
 
-The project is designed as a portfolio-grade reference implementation for aerospace AI roles where ontology engineering, retrieval-augmented generation, and agentic tool routing matter.
+### Local-first satellite knowledge graph and GraphRAG implementation
 
-## Demo Preview
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![ChromaDB](https://img.shields.io/badge/VectorDB-ChromaDB-000000?style=for-the-badge)](https://www.trychroma.com/)
+[![NetworkX](https://img.shields.io/badge/Graph-NetworkX-013220?style=for-the-badge)](https://networkx.org/)
+[![RDFLib](https://img.shields.io/badge/Ontology-RDFLib-red?style=for-the-badge)](https://rdflib.readthedocs.io/)
+[![spaCy](https://img.shields.io/badge/NLP-spaCy-09A3D5?style=for-the-badge&logo=spacy&logoColor=white)](https://spacy.io/)
 
-![SatKG-RAG Streamlit demo showing hybrid answers, source context, triples, ontology export, and interactive graph visualization](screenshots/image.png)
+Turns technical satellite documents into semantic chunks, RDF/OWL triples, an interactive knowledge graph, and grounded answers using hybrid Vector + Graph retrieval.
 
-## What It Does
+[Quick Start](#-quick-start) • [How It Works](#-how-it-works) • [Architecture](#-architecture) • [Project Structure](#-project-structure)
 
-- Ingests PDF, TXT, HTML, and HTM satellite documents.
-- Splits documents with token-aware chunking.
-- Extracts entities such as satellites, components, sensors, anomalies, telemetry parameters, mission phases, and organizations.
-- Builds subject-predicate-object triples from either fast local rules or optional Ollama extraction.
-- Materializes an RDF/OWL ontology with classes, object properties, data properties, domains, ranges, and instance typing.
-- Stores graph facts in NetworkX for traversal and visualization.
-- Indexes chunks in ChromaDB with sentence-transformer embeddings, with a deterministic local hashing fallback.
-- Answers questions using hybrid context: vector chunks plus graph-expanded relationships.
-- Visualizes the knowledge graph in Streamlit with readable node spacing, hover details, triple tables, source chunks, and Turtle export.
+</div>
 
-## Architecture
+---
+
+## ✨ What it does
+
+| Stage | Description |
+| --- | --- |
+| **Ingest** | Processes PDF, TXT, and HTML satellite documents with token-aware chunking |
+| **Extract** | Identifies entities (Satellites, Sensors, Anomalies) and extracts triples using fast local rules |
+| **Model** | Materializes an RDF/OWL ontology and builds a NetworkX knowledge graph |
+| **Retrieve** | Combines semantic vector search (ChromaDB) with graph-expanded entity context |
+| **Answer** | Generates grounded answers with clear source attribution and graph visualization |
+
+---
+
+## 🚀 Key Features
+
+- **Ontology-First Design**: Defines formal satellite-domain concepts and relationships (e.g., `thermal anomaly causedBy battery subsystem`).
+- **Hybrid GraphRAG**: Merges semantic chunk retrieval with graph fact expansion for superior context.
+- **Explainable AI**: Side-by-side view of retrieved chunks, graph triples, ontology Turtle, and the final answer.
+- **Local-First Stack**: Zero-cost architecture; runs fully offline with optional Ollama support for advanced extraction.
+- **Interactive Visualization**: Explore the knowledge graph with readable node spacing, hover details, and triple tables.
+
+---
+
+## 🖼️ Application Interface
+
+![SatKG-RAG Streamlit demo](screenshots/image.png)
+
+---
+
+## 🏗️ Architecture
 
 ```text
 Documents
    |
    v
-Ingestion + Token Chunking
-   |        PyMuPDF, LangChain loaders, tiktoken
+Ingestion + Token Chunking (PyMuPDF, LangChain, tiktoken)
    |
    v
-Entity + Relation Extraction
-   |        spaCy / EntityRuler, Ollama optional, Pydantic validation
+Entity + Relation Extraction (spaCy / EntityRuler, Ollama optional)
    |
    v
-Ontology + Knowledge Graph
-   |        rdflib OWL/RDF, Turtle, NetworkX
+Ontology + Knowledge Graph (rdflib OWL/RDF, NetworkX)
    |
-   +----------------------+
-   |                      |
-   v                      v
-Chroma Vector Store     Graph Traversal
-sentence-transformers   entity neighborhood expansion
-   |                      |
-   +----------+-----------+
-              v
-        Hybrid GraphRAG
-              |
-              v
-       Streamlit Demo UI
+   +----------------------+----------------------+
+   |                                             |
+   v                                             v
+Chroma Vector Store                        Graph Traversal
+(sentence-transformers)             (entity neighborhood expansion)
+   |                                             |
+   +----------------------+----------------------+
+                          v
+                    Hybrid GraphRAG Fusion
+                          |
+                          v
+                   Streamlit Demo UI
 ```
 
-## Why This Project Matters
+---
 
-Most RAG demos stop at "upload PDF, ask question." SatKG-RAG goes further by making document knowledge explicit:
+## 🛠️ Tech Stack
 
-- **Ontology layer:** defines formal satellite-domain concepts and relationships.
-- **Knowledge graph layer:** exposes causal and structural relationships such as `thermal anomaly causedBy battery subsystem`.
-- **Hybrid retrieval:** combines semantic chunk retrieval with graph facts.
-- **Explainability:** shows retrieved chunks, graph triples, ontology Turtle, and generated answers side by side.
-- **Local-first stack:** no paid APIs are required; Ollama is optional.
+| Component | Technology | Why? |
+|-----------|------------|------|
+| **UI** | Streamlit | Rapid development of interactive data applications |
+| **Graph Visualization** | PyVis | Interactive, browser-based graph rendering |
+| **Vector DB** | ChromaDB | Lightweight, local, and easy to integrate |
+| **Ontology Engineering** | rdflib / Owlready2 | Industry standard for RDF/OWL and semantic web |
+| **NLP / NER** | spaCy | Fast, reliable entity extraction with custom rule support |
+| **Graph Logic** | NetworkX | Robust library for complex network analysis and traversal |
+| **Embeddings** | sentence-transformers | State-of-the-art local semantic embeddings |
 
-## Implemented Layers
+---
 
-| Layer | Technology | Status |
-|---|---|---|
-| Document ingestion | PyMuPDF, LangChain loaders | Implemented |
-| Token chunking | tiktoken | Implemented |
-| Entity extraction | spaCy + fallback EntityRuler | Implemented |
-| Triple extraction | Fast rules + optional Ollama | Implemented |
-| Schema validation | Pydantic | Implemented |
-| Ontology engineering | rdflib, OWL/RDF, Turtle | Implemented |
-| Graph storage | NetworkX | Implemented |
-| Vector retrieval | ChromaDB, sentence-transformers | Implemented |
-| GraphRAG fusion | Vector chunks + graph expansion | Implemented |
-| Agent routing | Rule-based tool router | Implemented |
-| UI | Streamlit, PyVis | Implemented |
-| Neo4j persistence | Neo4j Community | Not included yet |
-| Full LangGraph agent | LangGraph | Not included yet |
+## 🚀 Quick Start
 
-## Quick Start
-
-From the project root:
+### 1) Setup Environment
 
 ```powershell
+# Clone and enter directory
+cd SatKG-RAG
+
+# Create and activate virtual environment
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r requirements.txt
+# OR for development:
 pip install -e ".[dev]"
-streamlit run src\satkg_rag\ui_app.py --server.fileWatcherType none
 ```
 
-Then open:
-
-```text
-http://localhost:8501
-```
-
-The app can run without downloading a spaCy model. If `en_core_web_sm` is missing, it falls back to a lightweight satellite-domain `EntityRuler`.
-
-For stronger general NER:
-
+### 2) (Optional) Download NLP Models
+If you want stronger general NER beyond the built-in satellite rules:
 ```powershell
 python -m spacy download en_core_web_sm
 ```
 
-## Recommended Demo Flow
-
-1. Open the Streamlit app.
-2. Upload a satellite-related PDF or TXT file.
-3. Leave `Use Ollama extraction` off for a fast demo.
-4. Set `Max chunks to extract` between `5` and `20`.
-5. Click `Ingest + Extract`.
-6. Inspect:
-   - `Knowledge Graph`
-   - `Triples`
-   - `Ontology`
-7. Ask a question such as:
-
-```text
-Explain the thermal anomaly in SAT-102
-```
-
-or:
-
-```text
-What relationships mention battery temperature?
-```
-
-## Extraction Modes
-
-### Fast Local Rules
-
-Default mode. It is deterministic, quick, and works offline. It recognizes common satellite terms and creates graph facts such as:
-
-```text
-ThermalSensor --monitors--> BatteryTemperature
-thermal anomaly --causedBy--> battery subsystem
-SAT-102 --operatesDuring--> LEO
-```
-
-This mode is best for UI testing and demos.
-
-### Ollama Extraction
-
-Optional mode. It calls a local Ollama model once per chunk to extract triples. This can produce richer facts, but it is slower and depends on your local Ollama setup.
-
-Default model:
-
-```text
-mistral:7b
-```
-
-Make sure Ollama is running and the model is available:
-
+### 3) Run the Application
 ```powershell
-ollama pull mistral:7b
-ollama serve
+streamlit run src/satkg_rag/ui_app.py --server.fileWatcherType none
 ```
 
-## Answer Generation
+---
 
-By default, answers are generated deterministically from retrieved chunks and graph facts. This keeps the demo fast and reliable.
+## 💡 Recommended Demo Flow
 
-Optional Ollama answer generation can be enabled in the sidebar. When enabled, the app sends the hybrid context to the configured local model and asks it to answer only from the provided context.
+1. **Upload**: Drop a satellite-related PDF or TXT file into the uploader.
+2. **Configure**: Leave `Use Ollama extraction` off for a fast demo; set `Max chunks` to `10`.
+3. **Extract**: Click `Ingest + Extract` and watch the graph materialize.
+4. **Inspect**: Explore the `Knowledge Graph`, `Triples`, and `Ontology` tabs.
+5. **Query**: Ask: *"Explain the thermal anomaly in SAT-102"* or *"What relationships mention battery temperature?"*
 
-## Ontology Schema
+---
 
-Core classes:
-
-- `Satellite`
-- `Component`
-- `Anomaly`
-- `Sensor`
-- `MissionPhase`
-- `TelemetryParameter`
-
-Object properties:
-
-- `hasComponent`
-- `monitors`
-- `triggeredBy`
-- `causedBy`
-- `operatesDuring`
-- `mentionedWith`
-- `relatedTo`
-
-Data properties:
-
-- `hasTemperatureThreshold`
-- `hasNominalRange`
-- `hasTimestamp`
-
-The UI can export the generated ontology as Turtle:
-
-```text
-satkg_ontology.ttl
-```
-
-## Project Structure
+## 📂 Project Structure
 
 ```text
 src/satkg_rag/
-  agentic.py       rule-based routing for vector, graph, anomaly tools
-  config.py        pipeline configuration
-  extraction.py    entity extraction and triple extraction
-  graph_store.py   NetworkX graph storage and traversal
-  ingestion.py     document loading and token chunking
-  models.py        Pydantic data models
-  ontology.py      RDF/OWL ontology manager
-  pipeline.py      end-to-end GraphRAG pipeline
-  retrieval.py     ChromaDB vector retrieval and context fusion
-  ui_app.py        Streamlit application
+  ├── agentic.py       # Rule-based routing for vector/graph tools
+  ├── config.py        # Pipeline configuration
+  ├── extraction.py    # Entity and triple extraction logic
+  ├── graph_store.py   # NetworkX storage and traversal
+  ├── ingestion.py     # Document loading and chunking
+  ├── models.py        # Pydantic data models
+  ├── ontology.py      # RDF/OWL ontology management
+  ├── pipeline.py      # End-to-end GraphRAG pipeline
+  ├── retrieval.py     # ChromaDB retrieval and context fusion
+  └── ui_app.py        # Streamlit application entry point
 
 tests/
-  test_core_layers.py
+  └── test_core_layers.py
 ```
 
-## Testing
+---
+
+## ✅ Testing
 
 ```powershell
 $env:PYTHONPATH="src"
 python -m pytest -q
 ```
 
-Expected result:
+---
 
-```text
-6 passed
-```
+## 🎯 Positioning
 
-## Current Limitations
-
-SatKG-RAG is intentionally demo-oriented. It is not yet a production knowledge platform.
-
-Remaining production-grade work:
-
-- Replace rule routing with a full LangGraph state machine.
-- Add background ingestion jobs for large PDFs.
-- Add entity canonicalization with aliases and domain dictionaries.
-- Add Neo4j persistence and Cypher queries.
-- Add evaluation datasets for retrieval and triple extraction quality.
-- Add authentication, deployment configuration, and observability.
-
-## Tech Stack
-
-- Python
-- Streamlit
-- PyMuPDF
-- LangChain document loaders
-- tiktoken
-- spaCy
-- Ollama
-- Pydantic
-- rdflib
-- Owlready2
-- NetworkX
-- ChromaDB
-- sentence-transformers
-- PyVis
-
-## Positioning
-
-This project demonstrates the core shape of an aerospace GraphRAG system:
-
-- formal ontology modeling,
-- document-to-graph extraction,
-- graph-aware retrieval,
-- local LLM integration,
-- visible reasoning artifacts,
-- and a usable demo interface.
-
-It is a strong base for extending into a full satellite anomaly explanation assistant, telemetry reasoning tool, or aerospace maintenance knowledge system.
+This project serves as a portfolio-grade reference implementation for aerospace AI roles, demonstrating mastery in:
+- **Formal Ontology Modeling**
+- **Document-to-Graph Extraction Pipelines**
+- **Graph-Aware Retrieval-Augmented Generation**
+- **Local LLM Integration & Agentic Routing**
